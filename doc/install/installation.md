@@ -215,6 +215,9 @@ Make sure to edit both `gitlab.yml` and `puma.rb` to match your setup.
     # Change 'secure password' with the value you have given to $password
     # You can keep the double quotes around the password
     sudo -u git -H vim config/database.yml
+    
+    # Make config/database.yml readable to git only
+    sudo -u git -H chmod o-rwx config/database.yml
 
 ## Install Gems
 
