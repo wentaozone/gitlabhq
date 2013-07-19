@@ -50,22 +50,25 @@ window.startSpinner = ->
 window.stopSpinner = ->
   $('.turbolink-spinner').fadeOut()
 
-window.stopEndlessScroll = ->
+window.unbindEvents = ->
   $(document).unbind('scroll')
+  $(document).off('scroll')
 
 document.addEventListener("page:fetch", startSpinner)
-document.addEventListener("page:fetch", stopEndlessScroll)
+document.addEventListener("page:fetch", unbindEvents)
 document.addEventListener("page:receive", stopSpinner)
 
 $ ->
   # Click a .one_click_select field, select the contents
   $(".one_click_select").on 'click', -> $(@).select()
 
+  $('.remove-row').bind 'ajax:success', ->
+    $(this).closest('li').fadeOut()
+
   # Click a .appear-link, appear-data fadeout
   $(".appear-link").on 'click', (e) ->
     $('.appear-data').fadeIn()
     e.preventDefault()
-
 
   # Initialize chosen selects
   $('select.chosen').chosen()
@@ -110,6 +113,10 @@ $ ->
       when 115
         $("#search").focus()
         e.preventDefault()
+      when 63
+        new Shortcuts()
+        e.preventDefault()
+
 
   # Commit show suppressed diff
   $(".supp_diff_link").bind "click", ->

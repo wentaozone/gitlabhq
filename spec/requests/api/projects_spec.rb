@@ -8,7 +8,7 @@ describe API::API do
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }
   let(:admin) { create(:admin) }
-  let!(:project) { create(:project_with_code, creator_id: user.id) }
+  let!(:project) { create(:project_with_code, creator_id: user.id, namespace: user.namespace) }
   let!(:hook) { create(:project_hook, project: project, url: "http://example.com") }
   let!(:snippet) { create(:project_snippet, author: user, project: project, title: 'example') }
   let!(:users_project) { create(:users_project, user: user, project: project, project_access: UsersProject::MASTER) }
@@ -104,6 +104,21 @@ describe API::API do
         json_response[k.to_s].should == v
       end
     end
+
+    it "should set a project as public" do
+      project = attributes_for(:project, { public: true })
+      post api("/projects", user), project
+      json_response['public'].should be_true
+
+    end
+
+    it "should set a project as private" do
+      project = attributes_for(:project, { public: false })
+      post api("/projects", user), project
+      json_response['public'].should be_false
+
+    end
+
   end
 
   describe "POST /projects/user/:id" do
@@ -144,6 +159,21 @@ describe API::API do
         json_response[k.to_s].should == v
       end
     end
+
+    it "should set a project as public" do
+      project = attributes_for(:project, { public: true })
+      post api("/projects/user/#{user.id}", admin), project
+      json_response['public'].should be_true
+
+    end
+
+    it "should set a project as private" do
+      project = attributes_for(:project, { public: false })
+      post api("/projects/user/#{user.id}", admin), project
+      json_response['public'].should be_false
+
+    end
+
   end
 
   describe "GET /projects/:id" do
@@ -592,6 +622,73 @@ describe API::API do
       it "should return 404 Not Found with invalid ID" do
         delete api("/projects/#{project.id}/keys/404", user)
         response.status.should == 404
+      end
+    end
+  end
+
+  describe :fork_admin do
+    let(:project_fork_target) { create(:project) }
+    let(:project_fork_source) { create(:project, public: true) }
+
+    describe "POST /projects/:id/fork/:forked_from_id" do
+      let(:new_project_fork_source) { create(:project, public: true) }
+
+      it "shouldn't available for non admin users" do
+        post api("/projects/#{project_fork_target.id}/fork/#{project_fork_source.id}", user)
+        response.status.should == 403
+      end
+
+      it "should allow project to be forked from an existing project" do
+        project_fork_target.forked?.should_not be_true
+        post api("/projects/#{project_fork_target.id}/fork/#{project_fork_source.id}", admin)
+        response.status.should == 201
+        project_fork_target.reload
+        project_fork_target.forked_from_project.id.should == project_fork_source.id
+        project_fork_target.forked_project_link.should_not be_nil
+        project_fork_target.forked?.should be_true
+      end
+
+      it "should fail if forked_from project which does not exist" do
+        post api("/projects/#{project_fork_target.id}/fork/9999", admin)
+        response.status.should == 404
+      end
+
+      it "should fail with 409 if already forked" do
+        post api("/projects/#{project_fork_target.id}/fork/#{project_fork_source.id}", admin)
+        project_fork_target.reload
+        project_fork_target.forked_from_project.id.should == project_fork_source.id
+        post api("/projects/#{project_fork_target.id}/fork/#{new_project_fork_source.id}", admin)
+        response.status.should == 409
+        project_fork_target.reload
+        project_fork_target.forked_from_project.id.should == project_fork_source.id
+        project_fork_target.forked?.should be_true
+      end
+    end
+
+    describe "DELETE /projects/:id/fork" do
+
+      it "shouldn't available for non admin users" do
+        delete api("/projects/#{project_fork_target.id}/fork", user)
+        response.status.should == 403
+      end
+
+      it "should make forked project unforked" do
+        post api("/projects/#{project_fork_target.id}/fork/#{project_fork_source.id}", admin)
+        project_fork_target.reload
+        project_fork_target.forked_from_project.should_not be_nil
+        project_fork_target.forked?.should be_true
+        delete api("/projects/#{project_fork_target.id}/fork", admin)
+        response.status.should == 200
+        project_fork_target.reload
+        project_fork_target.forked_from_project.should be_nil
+        project_fork_target.forked?.should_not be_true
+      end
+
+      it "should be idempotent if not forked" do
+        project_fork_target.forked_from_project.should be_nil
+        delete api("/projects/#{project_fork_target.id}/fork", admin)
+        response.status.should == 200
+        project_fork_target.reload.forked_from_project.should be_nil
       end
     end
   end

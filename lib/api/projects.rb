@@ -61,11 +61,13 @@ module API
       #   name (required) - name for new project
       #   description (optional) - short project description
       #   default_branch (optional) - 'master' by default
-      #   issues_enabled (optional) - enabled by default
-      #   wall_enabled (optional) - enabled by default
-      #   merge_requests_enabled (optional) - enabled by default
-      #   wiki_enabled (optional) - enabled by default
+      #   issues_enabled (optional) 
+      #   wall_enabled (optional) 
+      #   merge_requests_enabled (optional) 
+      #   wiki_enabled (optional) 
+      #   snippets_enabled (optional)
       #   namespace_id (optional) - defaults to user namespace
+      #   public (optional) - false by default
       # Example Request
       #   POST /projects
       post do
@@ -77,7 +79,9 @@ module API
                                     :wall_enabled,
                                     :merge_requests_enabled,
                                     :wiki_enabled,
-                                    :namespace_id]
+                                    :snippets_enabled,
+                                    :namespace_id,
+                                    :public]
         @project = ::Projects::CreateContext.new(current_user, attrs).execute
         if @project.saved?
           present @project, with: Entities::Project
@@ -96,10 +100,12 @@ module API
       #   name (required) - name for new project
       #   description (optional) - short project description
       #   default_branch (optional) - 'master' by default
-      #   issues_enabled (optional) - enabled by default
-      #   wall_enabled (optional) - enabled by default
-      #   merge_requests_enabled (optional) - enabled by default
-      #   wiki_enabled (optional) - enabled by default
+      #   issues_enabled (optional) 
+      #   wall_enabled (optional) 
+      #   merge_requests_enabled (optional) 
+      #   wiki_enabled (optional)
+      #   snippets_enabled (optional)
+      #   public (optional)
       # Example Request
       #   POST /projects/user/:user_id
       post "user/:user_id" do
@@ -111,12 +117,50 @@ module API
                                     :issues_enabled,
                                     :wall_enabled,
                                     :merge_requests_enabled,
-                                    :wiki_enabled]
+                                    :wiki_enabled,
+                                    :snippets_enabled,
+                                    :public]
         @project = ::Projects::CreateContext.new(user, attrs).execute
         if @project.saved?
           present @project, with: Entities::Project
         else
           not_found!
+        end
+      end
+
+
+      # Mark this project as forked from another
+      #
+      # Parameters:
+      #   id: (required) - The ID of the project being marked as a fork
+      #   forked_from_id: (required) - The ID of the project it was forked from
+      # Example Request:
+      #   POST /projects/:id/fork/:forked_from_id
+      post ":id/fork/:forked_from_id" do
+        authenticated_as_admin!
+        forked_from_project = find_project(params[:forked_from_id])
+        unless forked_from_project.nil?
+          if user_project.forked_from_project.nil?
+            user_project.create_forked_project_link(forked_to_project_id: user_project.id, forked_from_project_id: forked_from_project.id)
+          else
+            render_api_error!("Project already forked", 409)
+          end
+        else
+          not_found!
+        end
+
+      end
+
+      # Remove a forked_from relationship
+      #
+      # Parameters:
+      # id: (required) - The ID of the project being marked as a fork
+      # Example Request:
+      #  DELETE /projects/:id/fork
+      delete ":id/fork" do
+        authenticated_as_admin!
+        unless user_project.forked_project_link.nil?
+          user_project.forked_project_link.destroy
         end
       end
 

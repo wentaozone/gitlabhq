@@ -42,11 +42,13 @@ up-to-date and install it.
     apt-get install sudo -y
 
 **Note:**
-Vim is an editor that is used here whenever there are files that need to be
-edited by hand. But, you can use any editor you like instead.
+During this installation some files will need to be edited manually.
+If you are familiar with vim set it as default editor with the commands below.
+If you are not familiar with vim please skip this and keep using the default editor.
 
-    # Install vim
+    # Install vim and set as default editor
     sudo apt-get install -y vim
+    sudo update-alternatives --set editor /usr/bin/vim.basic
 
 Install the required packages:
 
@@ -86,8 +88,8 @@ Remove the old Ruby 1.8 if present
 Download Ruby and compile it:
 
     mkdir /tmp/ruby && cd /tmp/ruby
-    curl --progress http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p392.tar.gz | tar xz
-    cd ruby-1.9.3-p392
+    curl --progress ftp://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p247.tar.gz | tar xz
+    cd ruby-2.0.0-p247
     ./configure
     make
     sudo make install
@@ -123,7 +125,7 @@ GitLab Shell is a ssh access and repository management software developed specia
 
     # Edit config and replace gitlab_url
     # with something like 'http://domain.com/'
-    sudo -u git -H vim config.yml
+    sudo -u git -H editor config.yml
 
     # Do setup
     sudo -u git -H ./bin/install
@@ -162,7 +164,7 @@ You can change `5-3-stable` to `master` if you want the *bleeding edge* version,
 
     # Make sure to change "localhost" to the fully-qualified domain name of your
     # host serving GitLab where necessary
-    sudo -u git -H vim config/gitlab.yml
+    sudo -u git -H editor config/gitlab.yml
 
     # Make sure GitLab can write to the log/ and tmp/ directories
     sudo chown -R git log/
@@ -184,11 +186,11 @@ You can change `5-3-stable` to `master` if you want the *bleeding edge* version,
     sudo chmod -R u+rwX  public/uploads
 
     # Copy the example Puma config
-    sudo -u git -H cp config/puma.rb.example config/puma.rb
+    sudo -u git -H cp config/unicorn.rb.example config/unicorn.rb
 
     # Enable cluster mode if you expect to have a high load instance
     # Ex. change amount of workers to 3 for 2GB RAM server
-    sudo -u git -H vim config/puma.rb
+    sudo -u git -H vim config/unicorn.rb
 
     # Configure Git global settings for git user, useful when editing via web
     # Edit user.email according to what is set in gitlab.yml
@@ -196,7 +198,7 @@ You can change `5-3-stable` to `master` if you want the *bleeding edge* version,
     sudo -u git -H git config --global user.email "gitlab@localhost"
 
 **Important Note:**
-Make sure to edit both `gitlab.yml` and `puma.rb` to match your setup.
+Make sure to edit both `gitlab.yml` and `unicorn.rb` to match your setup.
 
 ## Configure GitLab DB settings
 
@@ -214,7 +216,7 @@ Make sure to edit both `gitlab.yml` and `puma.rb` to match your setup.
     # Change 'root' to 'gitlab'
     # Change 'secure password' with the value you have given to $password
     # You can keep the double quotes around the password
-    sudo -u git -H vim config/database.yml
+    sudo -u git -H editor config/database.yml
     
     # Make config/database.yml readable to git only
     sudo -u git -H chmod o-rwx config/database.yml
@@ -226,10 +228,10 @@ Make sure to edit both `gitlab.yml` and `puma.rb` to match your setup.
     sudo gem install charlock_holmes --version '0.6.9.4'
 
     # For MySQL (note, the option says "without ... postgres")
-    sudo -u git -H bundle install --deployment --without development test postgres
+    sudo -u git -H bundle install --deployment --without development test postgres unicorn aws
 
     # Or for PostgreSQL (note, the option says "without ... mysql")
-    sudo -u git -H bundle install --deployment --without development test mysql
+    sudo -u git -H bundle install --deployment --without development test mysql unicorn aws
 
 
 ## Initialize Database and Activate Advanced Features
@@ -278,8 +280,8 @@ However there are still a few steps left.
 # 7. Nginx
 
 **Note:**
-If you can't or don't want to use Nginx as your web server, have a look at the
-[`Advanced Setup Tips`](./installation.md#advanced-setup-tips) section.
+Nginx is the officially supported web server for GitLab. If you cannot or do not want to use Nginx as your web server, have a look at the
+[GitLab recipes](https://github.com/gitlabhq/gitlab-recipes).
 
 ## Installation
     sudo apt-get install -y nginx
@@ -295,7 +297,7 @@ Make sure to edit the config file to match your setup:
 
     # Change YOUR_SERVER_FQDN to the fully-qualified
     # domain name of your host serving GitLab.
-    sudo vim /etc/nginx/sites-available/gitlab
+    sudo editor /etc/nginx/sites-available/gitlab
 
 ## Restart
 

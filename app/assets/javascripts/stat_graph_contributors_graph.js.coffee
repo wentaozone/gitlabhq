@@ -46,7 +46,11 @@ class window.ContributorsGraph
 
 class window.ContributorsMasterGraph extends ContributorsGraph
   constructor: (@data) ->
-    @width = 1100
+    if $(window).width() > 1214
+      @width = 1100
+    else
+      @width = 870
+
     @height = 125
     @x = null
     @y = null
@@ -71,7 +75,7 @@ class window.ContributorsMasterGraph extends ContributorsGraph
     super @width, @height
   create_axes: ->
     @x_axis = d3.svg.axis().scale(@x).orient("bottom")
-    @y_axis = d3.svg.axis().scale(@y).orient("left")
+    @y_axis = d3.svg.axis().scale(@y).orient("left").ticks(5)
   create_svg: ->
     @svg = d3.select("#contributors-master").append("svg")
     .attr("width", @width + @MARGIN.left + @MARGIN.right)
@@ -118,7 +122,11 @@ class window.ContributorsMasterGraph extends ContributorsGraph
 
 class window.ContributorsAuthorGraph extends ContributorsGraph
   constructor: (@data) ->
-    @width = 490
+    if $(window).width() > 1214
+      @width = 490
+    else
+      @width = 380
+    
     @height = 130
     @x = null
     @y = null
@@ -130,8 +138,8 @@ class window.ContributorsAuthorGraph extends ContributorsGraph
   create_scale: ->
     super @width, @height
   create_axes: ->
-    @x_axis = d3.svg.axis().scale(@x).orient("bottom").tickFormat(d3.time.format("%m/%d"));
-    @y_axis = d3.svg.axis().scale(@y).orient("left")
+    @x_axis = d3.svg.axis().scale(@x).orient("bottom").ticks(8)
+    @y_axis = d3.svg.axis().scale(@y).orient("left").ticks(5)
   create_area: (x, y) ->
     @area = d3.svg.area().x((d) ->
       parseDate = d3.time.format("%Y-%m-%d").parse
@@ -148,7 +156,7 @@ class window.ContributorsAuthorGraph extends ContributorsGraph
     .append("g")
     .attr("transform", "translate(" + @MARGIN.left + "," + @MARGIN.top + ")")
   draw_path: (data) ->
-    @svg.append("path").datum(data).attr("class", "area-contributor").attr("d", @area);
+    @svg.append("path").datum(data).attr("class", "area-contributor").attr("d", @area)
   draw: ->
     @create_scale()
     @create_axes()

@@ -68,10 +68,6 @@ input[type='text'].danger {
 
 fieldset legend { font-size: 17px; }
 
-/** PAGINATION **/
-.gitlab_pagination {
-}
-
 .tab-content {
   overflow: visible;
 }
@@ -86,4 +82,11 @@ fieldset legend { font-size: 17px; }
   @include linear-gradient(#f1f1f1, #e1e1e1);
   color: #333;
   text-shadow: 0 1px 1px #FFF;
+}
+
+pre.well-pre {
+  border: 1px solid #EEE;
+  background: #f9f9f9;
+  border-radius: 0;
+  color: #555;
 }

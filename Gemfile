@@ -23,7 +23,7 @@ gem 'omniauth-github'
 
 # Extracting information from a git repository
 # Provide access to Gitlab::Git library
-gem 'gitlab_git', '~> 1.3.0'
+gem 'gitlab_git', '~> 1.4.1'
 
 # Ruby/Rack Git Smart-HTTP Server Handler
 gem 'gitlab-grack', '~> 1.0.1', require: 'grack'
@@ -35,7 +35,7 @@ gem 'gitlab_omniauth-ldap', '1.0.3', require: "omniauth-ldap"
 gem "gitlab-pygments.rb", '~> 0.3.2', require: 'pygments.rb'
 
 # Git Wiki
-gem "gitlab-gollum-lib", "~> 1.0.0", require: 'gollum-lib'
+gem "gitlab-gollum-lib", "~> 1.0.1", require: 'gollum-lib'
 
 # Language detection
 gem "github-linguist", require: "linguist"
@@ -59,8 +59,9 @@ gem "haml-rails"
 
 # Files attachments
 gem "carrierwave"
+
 # for aws storage
-# gem "fog", "~> 1.3.1"
+gem "fog", "~> 1.3.1", group: :aws
 
 # Authorization
 gem "six"
@@ -76,7 +77,8 @@ gem "github-markup", "~> 0.7.4", require: 'github/markup'
 gem  "asciidoctor"
 
 # Servers
-gem "puma", '~> 2.0.1'
+gem "puma", '~> 2.3.1', group: :puma
+gem "unicorn", '~> 4.6.3', group: :unicorn
 
 # State machine
 gem "state_machine"
@@ -116,6 +118,9 @@ gem "d3_rails", "~> 3.1.4"
 # underscore-rails
 gem "underscore-rails", "~> 1.4.4"
 
+# Sanitize user input
+gem "sanitize"
+
 group :assets do
   gem "sass-rails"
   gem "coffee-rails"
@@ -132,7 +137,7 @@ group :assets do
   gem "modernizr",        "2.6.2"
   gem "raphael-rails",    git: "https://github.com/gitlabhq/raphael-rails.git"
   gem 'bootstrap-sass'
-  gem "font-awesome-rails", "~> 3.1.1"
+  gem "font-awesome-rails"
   gem "gemoji", "~> 1.2.1", require: 'emoji/railtie'
   gem "gon"
 end
@@ -168,7 +173,7 @@ group :development, :test do
   gem 'factory_girl_rails'
 
   # Prevent occasions where minitest is not bundled in packaged versions of ruby (see #3826)
-  gem 'minitest'
+  gem 'minitest', '~> 4.7.0'
 
   # Generate Fake data
   gem "ffaker"
@@ -198,5 +203,5 @@ group :test do
 end
 
 group :production do
-  gem "gitlab_meta", '5.0'
+  gem "gitlab_meta", '6.0'
 end

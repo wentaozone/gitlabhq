@@ -1,0 +1,22 @@
+= render "projects/commits/head"
+
+%h3.page-title
+  Compare View
+
+= render "form"
+
+- if @commits.size > 100
+  .alert.alert-block
+    %p
+      %strong Warning! This comparison include 100+ commits.
+    %p To prevent performance issue we dont show diff information.
+
+- if @commits.present?
+  %div.ui-box
+    .title
+      Commits (#{@commits.count})
+    %ul.well-list= render Commit.decorate(@commits)
+
+  - unless @diffs.empty?
+    %h4 Diff
+    = render "projects/commits/diffs", diffs: @diffs
