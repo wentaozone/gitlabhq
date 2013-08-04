@@ -71,6 +71,9 @@ Make sure you have the right version of Python installed.
     # If you get a "command not found" error create a link to the python binary
     sudo ln -s /usr/bin/python /usr/bin/python2
 
+    # For reStructuredText markup language support install required package:
+    sudo apt-get install python-docutils
+
 **Note:** In order to receive mail notifications, make sure to install a
 mail server. By default, Debian is shipped with exim4 whereas Ubuntu
 does not ship with one. The recommended mail server is postfix and you can install it with:
@@ -119,7 +122,7 @@ GitLab Shell is a ssh access and repository management software developed specia
     cd gitlab-shell
 
     # switch to right version
-    sudo -u git -H git checkout v1.4.0
+    sudo -u git -H git checkout v1.7.0
 
     sudo -u git -H cp config.yml.example config.yml
 
@@ -196,6 +199,7 @@ You can change `5-3-stable` to `master` if you want the *bleeding edge* version,
     # Edit user.email according to what is set in gitlab.yml
     sudo -u git -H git config --global user.name "GitLab"
     sudo -u git -H git config --global user.email "gitlab@localhost"
+    sudo -u git -H git config --global core.autocrlf input
 
 **Important Note:**
 Make sure to edit both `gitlab.yml` and `unicorn.rb` to match your setup.
@@ -360,7 +364,6 @@ These steps are fairly general and you will need to figure out the exact details
 * Add `gem "omniauth-your-auth-provider"` to the [Gemfile](https://github.com/gitlabhq/gitlabhq/blob/5-3-stable/Gemfile#L18)
 * Run `sudo -u git -H bundle install` to install the new gem(s)
 * Add provider specific configuration options to your `config/gitlab.yml` (you can use the [auth providers section of the example config](https://github.com/gitlabhq/gitlabhq/blob/5-3-stable/config/gitlab.yml.example#L53) as a reference)
-* Add icons for the new provider into the [vendor/assets/images/authbuttons](https://github.com/gitlabhq/gitlabhq/tree/5-3-stable/vendor/assets/images/authbuttons) directory (you can find some more popular ones over at https://github.com/intridea/authbuttons)
 * Restart GitLab
 
 ### Examples

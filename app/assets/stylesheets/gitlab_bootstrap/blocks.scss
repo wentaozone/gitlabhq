@@ -10,11 +10,10 @@
  *
  */
 .ui-box {
-  background: #F9F9F9;
+  background: #FFF;
   margin-bottom: 20px;
   border: 1px solid #CCC;
   word-wrap: break-word;
-  @include solid-shade;
 
   &.ui-box-show {
     margin:20px 0;
@@ -71,10 +70,6 @@
     border-top: 1px solid #eee;
   }
 
-  &.white {
-    background: #fff;
-  }
-
   ul {
     margin: 0;
   }
@@ -102,6 +97,8 @@
 
     .btn {
       vertical-align: middle;
+      padding: 4px 12px;
+      @include box-shadow(0 0px 1px 1px #f2f2f2);
     }
 
     .nav-pills {
