@@ -2,7 +2,7 @@
 # based on filtering passed via params for @project
 class MergeRequestsLoadContext < BaseContext
   def execute
-    type = params[:f]
+    type = params[:status]
 
     merge_requests = project.merge_requests
 
@@ -14,7 +14,7 @@ class MergeRequestsLoadContext < BaseContext
                      end
 
     merge_requests = merge_requests.page(params[:page]).per(20)
-    merge_requests = merge_requests.includes(:author, :project).order("created_at desc")
+    merge_requests = merge_requests.includes(:author, :source_project, :target_project).order("created_at desc")
 
     # Filter by specific assignee_id (or lack thereof)?
     if params[:assignee_id].present?
